@@ -27,6 +27,18 @@ router.get("/new-post", async function (req, res) {
   res.render("create-post", { authors: authors });
 });
 
+// router.get("/posts/:id", async function (req, res) {
+//   const postId = req.params.id;
+//   const objectId = new ObjectId(postId);
+
+//   const singlePost = await dba
+//     .getDb()
+//     .collection("posts")
+//     .findOne({ _id: objectId });
+
+//   res.render("post-detail", { singlePost: singlePost });
+// });
+
 router.post("/posts", async function (req, res) {
   const authorId = new ObjectId(req.body.author);
   const author = await dba
@@ -45,9 +57,26 @@ router.post("/posts", async function (req, res) {
     },
   };
 
+  router.get("/posts:id", async function (req, res) {
+    const singlePost = newObject(req.body.post);
+  });
+
   const result = await dba.getDb().collection("posts").insertOne(newPost);
   console.log(result);
   res.redirect("/posts");
+});
+
+router.get("/posts/:id", async function (req, res) {
+  const postId = req.params.id;
+  const objectId = new ObjectId(postId);
+
+  const post = await dba.getDb().collection("posts").findOne({ _id: objectId });
+
+  if (!post) {
+    return res.status(404).render("404");
+  }
+
+  res.render("post-detail", { post: post });
 });
 
 module.exports = router;

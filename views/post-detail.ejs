@@ -2,22 +2,36 @@
 <html lang="en">
 
 <head>
-  <%- include('includes/head', { title: 'Post title' }) %>
-  <link rel="stylesheet" href="/styles/posts.css">
+  <%- include('includes/head', { title: post.title }) %>
+    <link rel="stylesheet" href="/styles/posts.css">
 </head>
 
 <body>
   <%- include('includes/header') %>
-  <main id="post-detail">
-    <h1>...</h1>
-    <section id="post-meta">
-      ...
-    </section>
-    <hr>
-    <section>
-      <p id="body">...</p>
-    </section>
-  </main>
+    <main id="post-detail">
+      <h1>
+        <%= post.title %>
+      </h1>
+      <section id="post-meta">
+        <address>
+          <a href="mailto:<%=post.author.email  %>">
+            <%= post.author.name %>
+          </a>
+        </address> | <time datetime="<%= post.date %>">
+          <%= post.date %>
+        </time>
+        <p>Author: <%= post.author.name %>
+        </p>
+        <p>Published on: <%= new Date(post.date).toLocaleDateString() %>
+        </p>
+      </section>
+      <hr>
+      <section>
+        <p id="body">
+          <%= post.body %>
+        </p>
+      </section>
+    </main>
 </body>
 
 </html>
