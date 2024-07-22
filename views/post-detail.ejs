@@ -18,11 +18,13 @@
             <%= post.author.name %>
           </a>
         </address> | <time datetime="<%= post.date %>">
-          <%= post.date %>
+          <%= post.humanReadableDate %>
         </time>
         <p>Author: <%= post.author.name %>
         </p>
         <p>Published on: <%= new Date(post.date).toLocaleDateString() %>
+            <p>Summary: <%=post.summary %>
+            </p>
         </p>
       </section>
       <hr>

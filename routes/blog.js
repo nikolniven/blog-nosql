@@ -75,8 +75,50 @@ router.get("/posts/:id", async function (req, res) {
   if (!post) {
     return res.status(404).render("404");
   }
-
+  post.humanReadableDate = post.date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  post.date = post.date.toISOString();
   res.render("post-detail", { post: post });
+});
+
+router.get("/posts/:id/edit", async function (req, res) {
+  const postId = req.params.id;
+  const objectId = new ObjectId(postId);
+
+  const post = await dba.getDb().collection("posts").findOne({ _id: objectId });
+
+  if (!post) {
+    return res.status(404).render("404");
+  }
+
+  // Render the edit form with the post data
+  res.render("update-post", { post: post });
+});
+
+router.post("/posts/:id/edit", async function (req, res) {
+  const postId = req.params.id;
+  const objectId = new ObjectId(postId);
+
+  const updatedPost = {
+    title: req.body.title,
+    summary: req.body.summary,
+    content: req.body.content,
+  };
+
+  const result = await dba
+    .getDb()
+    .collection("posts")
+    .updateOne({ _id: objectId }, { $set: updatedPost });
+
+  if (result.modifiedCount === 0) {
+    return res.status(404).render("404");
+  }
+
+  res.redirect("/posts/" + postId);
 });
 
 module.exports = router;
