@@ -106,7 +106,7 @@ router.post("/posts/:id/edit", async function (req, res) {
   const updatedPost = {
     title: req.body.title,
     summary: req.body.summary,
-    content: req.body.content,
+    body: req.body.content,
   };
 
   const result = await dba
