@@ -121,4 +121,16 @@ router.post("/posts/:id/edit", async function (req, res) {
   res.redirect("/posts/" + postId);
 });
 
+router.post("/posts/:id/delete", async function (req, res) {
+  const postId = req.params.id;
+  const objectId = new ObjectId(postId);
+
+  const result = await dba
+    .getDb()
+    .collection("posts")
+    .deleteOne({ _id: objectId });
+
+  res.redirect("/posts");
+});
+
 module.exports = router;
