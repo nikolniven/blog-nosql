@@ -66,28 +66,33 @@ router.post("/posts", async function (req, res) {
   res.redirect("/posts");
 });
 
-router.get("/posts/:id", async function (req, res, next) {
-  const postId = req.params.id;
+router.get("/posts/:id", async function (req, res) {
+  const postId = req.params.id; // Extract the post ID from the URL
   try {
-    const objectId = new ObjectId(postId);
+    const objectId = new ObjectId(postId); // Convert the ID to an ObjectId
+    const post = await dba
+      .getDb()
+      .collection("posts")
+      .findOne({ _id: objectId }); // Fetch the post by ID
+
+    if (!post) {
+      return res.status(404).render("404"); // If no post found, render the 404 page
+    }
+
+    // Add human-readable date to the post object
+    post.humanReadableDate = post.date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    post.date = post.date.toISOString(); // Convert date to ISO format
+
+    res.render("post-detail", { post: post }); // Render the post-detail.ejs template with the post data
   } catch (error) {
-    return res.status(404).render("404");
-    //return next(error);
+    console.error(error); // Log the error for debugging
+    return res.status(500).render("500"); // Render the 500 error page if an unexpected error occurs
   }
-
-  const post = await dba.getDb().collection("posts").findOne({ _id: ObjectId });
-
-  if (!post) {
-    return res.status(404).render("404");
-  }
-  post.humanReadableDate = post.date.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  post.date = post.date.toISOString();
-  res.render("post-detail", { post: post });
 });
 
 router.get("/posts/:id/edit", async function (req, res) {
