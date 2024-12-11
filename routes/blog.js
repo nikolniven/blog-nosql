@@ -17,6 +17,7 @@ router.get("/posts", async function (req, res) {
     .getDb()
     .collection("posts")
     .find({}, { title: 1, summary: 1, "author.name": 1 })
+    .sort({ date: -1 })
     .toArray();
   res.render("posts-list", { posts: posts });
 });
@@ -27,13 +28,12 @@ router.get("/new-post", async function (req, res) {
   res.render("create-post", { authors: authors });
 });
 
-
 router.post("/posts", async function (req, res) {
   const authorId = new ObjectId(req.body.author);
   const author = await dba
-  .getDb()
-  .collection("authors")
-  .findOne({ _id: authorId });
+    .getDb()
+    .collection("authors")
+    .findOne({ _id: authorId });
   const newPost = {
     title: req.body.title,
     summary: req.body.summary,
@@ -45,29 +45,14 @@ router.post("/posts", async function (req, res) {
       email: author.email,
     },
   };
-  
- // router.get("/posts:id", async function (req, res) {
-    // const singlePost = newObject(req.body.post);
-  // });
-  
-  // const result = await dba.getDb().collection("posts").insertOne(newPost);
-  // console.log(result);
-  // res.redirect("/posts");
-// });
+  // Insert the new post into the database
+  const result = await dba.getDb().collection("posts").insertOne(newPost);
+  console.log(result); // Optional: log the result to the console for debugging
 
-// router.get("/posts/:id", async function (req, res) {
-//   const postId = req.params.id;
-//   const objectId = new ObjectId(postId);
+  // Redirect to the posts page after adding the post
+  res.redirect("/posts");
+});
 
-//   const singlePost = await dba
-//     .getDb()
-//     .collection("posts")
-//     .findOne({ _id: objectId });
-
-//   res.render("post-detail", { singlePost: singlePost });
-// });
-
-/////
 router.get("/posts/:id", async function (req, res) {
   const postId = req.params.id; // Extract the post ID from the URL
   try {
